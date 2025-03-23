@@ -1,0 +1,130 @@
+/* Reset básico */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Arial', sans-serif;
+}
+
+/* Estilização geral */
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background:white;
+    color: rgb(0, 0, 0);
+}
+
+/* Container principal */
+.container {
+    width: 90%;
+    max-width: 400px;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    padding: 20px;
+    border-radius: 10px;
+    text-align: center;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+    animation: fadeIn 0.5s ease-in-out;
+}
+
+/* Títulos */
+h2 {
+    margin-bottom: 20px;
+    font-size: 1.5rem;
+}
+
+/* Formulários */
+form {
+    margin-bottom: 15px;
+}
+
+/* Inputs e selects */
+label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+select {
+    width: 70%;
+    padding: 10px;
+    border: 1px solid black;
+    border-radius: 5px;
+    font-size: 1rem;
+    transition: 0.3s;
+    animation: fadeIn 0.5s ease-in-out;
+}
+
+select:focus {
+    outline: none;
+    border-color: #0077ff;
+    background: rgba(255, 255, 255, 0.2);
+}
+
+
+/* Botão Voltar */
+.back-btn {
+    background: #ff4c4c;
+    border: none;
+    padding: 10px;
+    color: white;
+    width: 70%;
+    border-radius: 5px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.back-btn:hover {
+    background: #cc0000;
+}
+
+/* Cartão de resultado */
+.result-card {
+    background: rgba(255, 255, 255, 0.2);
+    padding: 15px;
+    border-radius: 10px;
+    margin-top: 20px;
+    animation: fadeIn 0.5s ease-in-out;
+}
+
+.result-card h3 {
+    margin-bottom: 10px;
+}
+.result-card p {
+    margin-bottom: 10px;
+}
+
+/* Botão Nova Pesquisa */
+.reset-btn {
+    margin-top: 20px;
+    background: #4CAF50;
+    border: none;
+    padding: 10px;
+    color: white;
+    width: 70%;
+    border-radius: 5px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.reset-btn:hover {
+    background: #388E3C;
+}
+
+/* Animações */
+@keyframes fadeIn {
+    from { opacity: 0; transform: scale(0.9); }
+    to { opacity: 1; transform: scale(1); }
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+    .container {
+        width: 95%;
+        max-width: 350px;
+    }
+}
