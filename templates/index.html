@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Consulta FIPE</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+
+    <div class="container">
+        <h2>Consulta de Veículos</h2>
+
+        {% if not vehicle_type %}
+        <form method="POST" class="step">
+            <label for="vehicle_type">Tipo de Veículo:</label>
+            <select name="vehicle_type" id="vehicle_type" required onchange="this.form.submit()">
+                <option value="">Selecione</option>
+                <option value="carros">Carro</option>
+                <option value="motos">Moto</option>
+                <option value="caminhoes">Caminhão</option>
+            </select>
+        </form>
+        {% endif %}
+
+        {% if vehicle_type and not selected_brand %}
+        <form method="POST" class="step">
+            <input type="hidden" name="vehicle_type" value="{{ vehicle_type }}">
+            <label for="brand">Selecione a marca:</label>
+            <select name="brand" id="brand" required onchange="this.form.submit()">
+                <option value="">Selecione</option>
+                {% for brand in brands %}
+                <option value="{{ brand.codigo }}">{{ brand.nome }}</option>
+                {% endfor %}
+            </select>
+        </form>
+        <form method="POST">
+            <button class="back-btn" name="vehicle_type" value="">Voltar</button>
+        </form>
+        {% endif %}
+
+        {% if selected_brand and not selected_model %}
+        <form method="POST" class="step">
+            <input type="hidden" name="vehicle_type" value="{{ vehicle_type }}">
+            <input type="hidden" name="brand" value="{{ selected_brand }}">
+            <label for="model">Selecione o modelo:</label>
+            <select name="model" id="model" required onchange="this.form.submit()">
+                <option value="">Selecione</option>
+                {% for model in models %}
+                <option value="{{ model.codigo }}">{{ model.nome }}</option>
+                {% endfor %}
+            </select>
+        </form>
+        <form method="POST">
+            <input type="hidden" name="vehicle_type" value="{{ vehicle_type }}">
+            <button class="back-btn" name="brand" value="">Voltar</button>
+        </form>
+        {% endif %}
+
+        {% if selected_model and not selected_year %}
+        <form method="POST" class="step">
+            <input type="hidden" name="vehicle_type" value="{{ vehicle_type }}">
+            <input type="hidden" name="brand" value="{{ selected_brand }}">
+            <input type="hidden" name="model" value="{{ selected_model }}">
+            <label for="year">Selecione o ano:</label>
+            <select name="year" id="year" required onchange="this.form.submit()">
+                <option value="">Selecione</option>
+                {% for year in years %}
+                <option value="{{ year.codigo }}">{{ year.nome }}</option>
+                {% endfor %}
+            </select>
+        </form>
+        <form method="POST">
+            <input type="hidden" name="vehicle_type" value="{{ vehicle_type }}">
+            <input type="hidden" name="brand" value="{{ selected_brand }}">
+            <button class="back-btn" name="model" value="">Voltar</button>
+        </form>
+        {% endif %}
+
+        {% if vehicle_data %}
+        <div class="result-card">
+            <h3>Detalhes do Veículo</h3>
+            <p><strong>Marca:</strong> {{ vehicle_data.Marca }}</p>
+            <p><strong>Modelo:</strong> {{ vehicle_data.Modelo }}</p>
+            <p><strong>Ano:</strong> {{ vehicle_data.AnoModelo }}</p>
+            <p><strong>Combustível:</strong> {{ vehicle_data.Combustivel }}</p>
+            <p><strong>Valor:</strong> {{ vehicle_data.Valor }}</p>
+            <p><strong>Código FIPE:</strong> {{ vehicle_data.CodigoFipe }}</p>
+            <p><strong>Mês:</strong> {{ vehicle_data.MesReferencia }}</p>
+        </div>
+        <form method="POST">
+            <button class="reset-btn" name="reset" value="1">Nova Pesquisa</button>
+        </form>
+        {% endif %}
+    </div>
+
+</body>
+</html>
+
+<script>
+        document.addEventListener("DOMContentLoaded", function() {
+            function autoSubmitForm(formId) {
+                document.getElementById(formId).addEventListener("change", function() {
+                    this.submit();
+                });
+            }
+
+            autoSubmitForm("vehicleForm");
+            autoSubmitForm("brandForm");
+            autoSubmitForm("modelForm");
+            autoSubmitForm("yearForm");
+        });
+    </script>
