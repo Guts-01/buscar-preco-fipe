@@ -1,113 +1,122 @@
-<!DOCTYPE html>
-<html lang="pt">
+<!doctype html>
+<html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Consulta FIPE</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Consulte o preço de referência de carros, motos e caminhões na Tabela FIPE.">
+    <title>Consulta FIPE | Valor do seu veículo</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <script src="{{ url_for('static', filename='app.js') }}" defer></script>
 </head>
 <body>
+    <div class="page-shell">
+        <header class="site-header">
+            <a class="brand" href="{{ url_for('index') }}" aria-label="Consulta FIPE, página inicial">
+                <span class="brand-mark" aria-hidden="true">F</span>
+                <span>Consulta Preços da tabela <span class="brand-accent">FIPE</span></span>
+            </a>
+            <span class="header-note">Preço de referência para veículos</span>
+        </header>
 
-    <div class="container">
-        <h2>Consulta de Veículos</h2>
+        <main>
+            <section class="hero" aria-labelledby="page-title">
+                <div class="hero-copy">
+                    <!-- <span class="eyebrow"><span class="eyebrow-dot" aria-hidden="true"></span> Consulta simples e gratuita</span> -->
+                    <h1 id="page-title">Descubra o valor do seu veículo.</h1>
+                    <p>Selecione os dados abaixo para consultar o preço de referência na Tabela FIPE.</p>
+                    <div class="hero-detail">
+                        <span class="detail-icon" aria-hidden="true">✓</span>
+                        <span>Carros, motos e caminhões em um só lugar</span>
+                    </div>
+                </div>
 
-        {% if not vehicle_type %}
-        <form method="POST" class="step">
-            <label for="vehicle_type">Tipo de Veículo:</label>
-            <select name="vehicle_type" id="vehicle_type" required onchange="this.form.submit()">
-                <option value="">Selecione</option>
-                <option value="carros">Carro</option>
-                <option value="motos">Moto</option>
-                <option value="caminhoes">Caminhão</option>
-            </select>
-        </form>
-        {% endif %}
+                <section class="search-card" aria-labelledby="search-title">
+                    <div class="card-heading">
+                        <div>
+                            <span class="section-kicker">PESQUISA</span>
+                            <h2 id="search-title">Dados do veículo</h2>
+                        </div>
+                        <span class="step-count">4 etapas</span>
+                    </div>
 
-        {% if vehicle_type and not selected_brand %}
-        <form method="POST" class="step">
-            <input type="hidden" name="vehicle_type" value="{{ vehicle_type }}">
-            <label for="brand">Selecione a marca:</label>
-            <select name="brand" id="brand" required onchange="this.form.submit()">
-                <option value="">Selecione</option>
-                {% for brand in brands %}
-                <option value="{{ brand.codigo }}">{{ brand.nome }}</option>
-                {% endfor %}
-            </select>
-        </form>
-        <form method="POST">
-            <button class="back-btn" name="vehicle_type" value="">Voltar</button>
-        </form>
-        {% endif %}
+                    {% if error_message %}
+                    <p class="alert" role="alert">{{ error_message }}</p>
+                    {% endif %}
 
-        {% if selected_brand and not selected_model %}
-        <form method="POST" class="step">
-            <input type="hidden" name="vehicle_type" value="{{ vehicle_type }}">
-            <input type="hidden" name="brand" value="{{ selected_brand }}">
-            <label for="model">Selecione o modelo:</label>
-            <select name="model" id="model" required onchange="this.form.submit()">
-                <option value="">Selecione</option>
-                {% for model in models %}
-                <option value="{{ model.codigo }}">{{ model.nome }}</option>
-                {% endfor %}
-            </select>
-        </form>
-        <form method="POST">
-            <input type="hidden" name="vehicle_type" value="{{ vehicle_type }}">
-            <button class="back-btn" name="brand" value="">Voltar</button>
-        </form>
-        {% endif %}
+                    <form action="{{ url_for('index') }}" method="get" id="vehicle-form">
+                        <div class="form-field">
+                            <label for="vehicle_type"><span class="field-number">01</span> Tipo de veículo</label>
+                            <select id="vehicle_type" name="vehicle_type" required data-reset="brand,model,year">
+                                <option value="">Selecione o tipo</option>
+                                {% for code, name in vehicle_types.items() %}
+                                <option value="{{ code }}" {% if vehicle_type == code %}selected{% endif %}>{{ name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
 
-        {% if selected_model and not selected_year %}
-        <form method="POST" class="step">
-            <input type="hidden" name="vehicle_type" value="{{ vehicle_type }}">
-            <input type="hidden" name="brand" value="{{ selected_brand }}">
-            <input type="hidden" name="model" value="{{ selected_model }}">
-            <label for="year">Selecione o ano:</label>
-            <select name="year" id="year" required onchange="this.form.submit()">
-                <option value="">Selecione</option>
-                {% for year in years %}
-                <option value="{{ year.codigo }}">{{ year.nome }}</option>
-                {% endfor %}
-            </select>
-        </form>
-        <form method="POST">
-            <input type="hidden" name="vehicle_type" value="{{ vehicle_type }}">
-            <input type="hidden" name="brand" value="{{ selected_brand }}">
-            <button class="back-btn" name="model" value="">Voltar</button>
-        </form>
-        {% endif %}
+                        <div class="form-field">
+                            <label for="brand"><span class="field-number">02</span> Marca</label>
+                            <select id="brand" name="brand" data-reset="model,year" {% if not brands %}disabled{% endif %}>
+                                <option value="">Selecione a marca</option>
+                                {% for option in brands %}
+                                <option value="{{ option.codigo }}" {% if selected_brand == option.codigo|string %}selected{% endif %}>{{ option.nome }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
 
-        {% if vehicle_data %}
-        <div class="result-card">
-            <h3>Detalhes do Veículo</h3>
-            <p><strong>Marca:</strong> {{ vehicle_data.Marca }}</p>
-            <p><strong>Modelo:</strong> {{ vehicle_data.Modelo }}</p>
-            <p><strong>Ano:</strong> {{ vehicle_data.AnoModelo }}</p>
-            <p><strong>Combustível:</strong> {{ vehicle_data.Combustivel }}</p>
-            <p><strong>Valor:</strong> {{ vehicle_data.Valor }}</p>
-            <p><strong>Código FIPE:</strong> {{ vehicle_data.CodigoFipe }}</p>
-            <p><strong>Mês:</strong> {{ vehicle_data.MesReferencia }}</p>
-        </div>
-        <form method="POST">
-            <button class="reset-btn" name="reset" value="1">Nova Pesquisa</button>
-        </form>
-        {% endif %}
+                        <div class="form-field">
+                            <label for="model"><span class="field-number">03</span> Modelo</label>
+                            <select id="model" name="model" data-reset="year" {% if not models %}disabled{% endif %}>
+                                <option value="">Selecione o modelo</option>
+                                {% for option in models %}
+                                <option value="{{ option.codigo }}" {% if selected_model == option.codigo|string %}selected{% endif %}>{{ option.nome }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="form-field">
+                            <label for="year"><span class="field-number">04</span> Ano e combustível</label>
+                            <select id="year" name="year" {% if not years %}disabled{% endif %}>
+                                <option value="">Selecione o ano</option>
+                                {% for option in years %}
+                                <option value="{{ option.codigo }}" {% if selected_year == option.codigo|string %}selected{% endif %}>{{ option.nome }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="form-actions">
+                            <!-- <button class="primary-button" type="submit">{{ 'Consultar preço' if selected_year else 'Continuar' }} </button> -->
+                            {% if vehicle_type %}<a class="primary-button" href="{{ url_for('index') }}">Limpar pesquisa</a>{% endif %}
+                        </div>
+                    </form>
+                </section>
+            </section>
+
+            {% if vehicle_data %}
+            <section class="result-card" aria-labelledby="result-title">
+                <div class="result-main">
+                    <span class="section-kicker">RESULTADO DA CONSULTA</span>
+                    <h2 id="result-title">{{ vehicle_data.Marca or brand.nome }} {{ vehicle_data.Modelo or model.nome }}</h2>
+                    <p>Valor de referência da Tabela FIPE</p>
+                    <strong class="result-price">{{ vehicle_data.Valor }}</strong>
+                    <span class="result-reference">Referência: {{ vehicle_data.MesReferencia }}</span>
+                </div>
+                <div class="result-details">
+                    <h3>Detalhes do veículo</h3>
+                    <dl>
+                        <div><dt>Tipo</dt><dd>{{ vehicle_types[vehicle_type] }}</dd></div>
+                        <div><dt>Marca</dt><dd>{{ vehicle_data.Marca or brand.nome }}</dd></div>
+                        <div><dt>Modelo</dt><dd>{{ vehicle_data.Modelo or model.nome }}</dd></div>
+                        <div><dt>Ano</dt><dd>{{ vehicle_data.AnoModelo }}</dd></div>
+                        <div><dt>Combustível</dt><dd>{{ vehicle_data.Combustivel }}</dd></div>
+                        <div><dt>Código FIPE</dt><dd>{{ vehicle_data.CodigoFipe }}</dd></div>
+                    </dl>
+                </div>
+            </section>
+            {% endif %}
+        </main>
+
+        <footer class="site-footer">Os valores exibidos são referências de mercado e podem variar conforme o veículo.</footer>
     </div>
-
 </body>
 </html>
-
-<script>
-        document.addEventListener("DOMContentLoaded", function() {
-            function autoSubmitForm(formId) {
-                document.getElementById(formId).addEventListener("change", function() {
-                    this.submit();
-                });
-            }
-
-            autoSubmitForm("vehicleForm");
-            autoSubmitForm("brandForm");
-            autoSubmitForm("modelForm");
-            autoSubmitForm("yearForm");
-        });
-    </script>
